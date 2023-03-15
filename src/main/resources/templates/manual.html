@@ -1,0 +1,24 @@
+<h1>User Manual<b style="color:red;">.</b></h1>
+<b>Require: Generate a regex to match Mac Address:</b>
+<pre>
+5c:0a:5b:63:4a:82
+50:06:04:92:53:44
+00:21:dd:bc:95:44
+00:14:31:83:c6:8d
+00:1f:d6:19:0a:80
+00:30:fe:fd:d6:51
+
+<b>on this sample:</b>
+ACCEPT service http from 119.63.193.196, prefix: "none" (in: eth0 119.63.193.196(<b style="color:red;">5c:0a:5b:63:4a:82</b>):4399 -> 140.105.63.164(<b style="color:red;">50:06:04:92:53:44</b>):80 TCP
+ACCEPT service dns from 140.105.48.16, prefix: "none" (in: eth0 140.105.48.16(<b style="color:red;">00:21:dd:bc:95:44</b>):4263 -> 140.105.63.158(<b style="color:red;">00:14:31:83:c6:8d</b>):53 UDP
+DROP service 68->67(udp) from 216.34.211.83, prefix: "spoof iana-0/8" (in: eth0 213.92.153.78(<b style="color:red;">00:1f:d6:19:0a:80</b>):68 -> 69.43.177.110(<b style="color:red;">00:30:fe:fd:d6:51</b>):67 UDP
+</pre>
+<hr/>
+<h3>Step 1. Input the sample character and match character</h3>
+    <img src="./step1.png" style="text-align: center;" />
+<h3>Step 2. Press button "Generate Regex"</h3>
+    <img src="./step2.png" style="text-align: center;" />
+<h3>Step 3. Waiting for generate the best regex</h3>
+    <img src="./step3.png" style="text-align: center;" />
+<h3>Step 4. Press "Use The Best Regex" and "Match Regex" for match with best regex</h3>
+    <img src="./step4.png" style="text-align: center;" />

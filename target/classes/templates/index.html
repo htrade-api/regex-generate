@@ -1,0 +1,225 @@
+<html>
+
+<head>
+	<link rel="icon" href="./regex_icon.ico">
+	<title>Amazing Regex</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+	<script src='https://www.gstatic.com/firebasejs/4.6.0/firebase.js'></script>
+	<script>
+		var bestregex;
+
+		function copy(id) {
+			var $temp = $("<textarea>");
+			$("body").append($temp);
+			$temp.val($("#" + id).text()).select();
+			document.execCommand("copy");
+			$temp.remove();
+		}
+
+		function useregex() {
+			$("#regex").val(bestregex);
+			$("#regex").select();
+			document.execCommand("copy");
+		}
+		$(document).ready(
+
+			function () {
+				if (window.location.href.indexOf("matchregex") != -1) {
+					$('html, body').animate({
+						scrollTop: $("#matchregex").offset().top
+					}, 400);
+				}
+				setInterval(function () {
+					var key = $("#processkey").val();
+					if (key != '') {
+						$('#submit').prop('disabled', true);
+						$("#waiting").css('display', '')
+						$.ajax({
+							url: 'https://fir-db-for-spring-boot-79f61-default-rtdb.firebaseio.com/' + key + '.json',
+							dataType: 'json',
+							success: function (data) {
+								var percent = "";
+								if (data.percent != '100.1') {
+									percent += "Percent: " + data.percent + " %";
+									$("#progressbar").css({ "width": data.percent + "%" });
+								} else {
+									percent += "Percent: " + "done";
+									$("#progressbar").css({ "width": "100%" });
+								}
+								if (data.process == '10/10' || data.process == undefined) {
+									percent += " | Process: " + "done";
+									$('#submit').prop('disabled', false);
+									$("#processkey").val("");
+								} else {
+									percent += " | Process: " + data.process;
+								}
+
+								$("#percent").html(percent);
+								$("#regexList").html(data.regexList.join("<br/>"));
+								$("#bestregex").html("Best Regex (PCRE): " + data.regex);
+								bestregex = data.regex;
+
+							}
+						});
+					}
+				}, 1000);
+			});
+	</script>
+	<style type="text/css">
+		a,
+		a:hover,
+		a:focus,
+		a:active {
+			text-decoration: none;
+			color: inherit;
+		}
+
+		.buttonuse {
+			background-color: cadetblue;
+			border: none;
+			color: white;
+			padding: 5px 10px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 16px;
+			margin: 4px 2px;
+			cursor: pointer;
+			border-radius: 5px;
+		}
+
+		.buttonblack {
+			background-color: cadetblue;
+			border: none;
+			color: white;
+			padding: 10px 15px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 16px;
+			margin: 4px 2px;
+			cursor: pointer;
+			border-radius: 8px;
+		}
+
+		* {
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+			font-weight: 500;
+		}
+
+		input[type=input],
+		textarea {
+			width: 100%;
+			padding: 5px 5px;
+			margin: 8px 0;
+			box-sizing: border-box;
+			border-radius: 5px;
+		}
+
+		ul {
+			list-style-type: none;
+			padding: 0;
+			overflow: hidden;
+			background-color: #555555;
+			margin-top: -10px;
+		}
+
+		li {
+			float: left;
+		}
+
+		li a {
+			display: block;
+			color: white;
+			text-align: center;
+			padding: 14px 16px;
+			text-decoration: none;
+		}
+
+		li a:hover:not(.active) {
+			background-color: white;
+		}
+	</style>
+</head>
+
+<body>
+	<div style="width: 80%; margin: 0 auto; text-align: right;"><h2>Generate Regex<b style="color:red;">.</b></h2></div>
+	<div style="margin-left: 10px;margin-right: 10px;">
+		<form method="get" action="/regex">
+			<table style="width: 80%; margin: 0 auto;">
+				<tr>
+					<td style="width: 100%;"><textarea spellcheck="false" placeholder="Input strings you want to match"
+							style="width:100%;" type="input" name="findChar" id="findChar" th:text="${findChar}"
+							rows="10"></textarea></td>
+				</tr>
+				<tr><td><button type="submit" id="submit" class="buttonblack">Generate</button></td></tr>
+				<tr>
+					<td style="width: 50%; vertical-align: top;">
+						<div>
+							<h3 style="color:red;display: none;" id="waiting">Generating...</h3>
+							<div class="progress">
+								<div id="progressbar" class="progress-bar progress-bar-striped active"
+									role="progressbar" aria-valuenow="3" aria-valuemin="0" aria-valuemax="100"
+									style="width: 0%">
+									<p id="percent" />
+								</div>
+							</div>
+							<div>
+								<pre id="regexList" style="color:red;"></pre>
+							</div>
+							<div>
+								<p id="bestregex" style="font-weight: bold; color:red;" />
+							</div>
+							<a class="buttonuse" onclick="useregex();">Copy Best Regex</a>
+						</div>
+					</td>
+				</tr>
+			</table>
+			<input type="hidden" id="processkey" th:value="${key}" />
+			<div style="position: relative;">
+				<div style="position: absolute; top: 0;">
+					<input style="width: 100px; box-shadow: none; color: white; box-shadow: none;" spellcheck="false"
+						type="input" name="regex" id="regex" th:value="${regex}" />
+				</div>
+				<div style="position: absolute; background-color: white; width: 100px; height: 50px;"></div>
+			</div>
+		</form>
+		<!-- 
+		<div>
+		<hr />
+		<h2 id="matchregex">Match Regex<b style="color:red;">.</b></h2>
+		<form id="submit" method="get" action="matchregex">
+			<table style="width: 100%">
+			<colgroup>
+				<col style="width:55%;" />
+				<col style="width:45%;" />
+			</colgroup>
+				<tr style="width: 70%">
+					<td><input spellcheck="false" placeholder = "Regular Expression" style="width:98%;"  type="input" name="regex" id="regex" th:value="${regex}" /></td>
+					<td><button type="submit" id="submit" class="buttonblack">Match Regex</button></td>
+				</tr>
+				<tr>
+					<td><textarea spellcheck="false" placeholder = "Sample Character" style="width:98%;" type="input" name="str" th:text="${str}" rows="20"></textarea></td>
+					<td>
+					<h3>Match: <input type="button" class="buttonuse" onclick="copy('result');" value="copy"/></h3>
+					<pre name="result" id="result" th:text="${result}" style="word-wrap: break-word;"></pre>
+
+					<h3>Match (Remove Duplicates): <input type="button" class="buttonuse" onclick="copy('resultDuplicates');" value="copy"/></h3>
+					<pre name="resultDuplicates" id="resultDuplicates" th:text="${resultDuplicates}" style="word-wrap: break-word;"></pre>
+					</td>
+				</tr>
+			</table>
+			<div style="display: none;">
+				<textarea name="findChar" th:text="${findChar}" ></textarea>
+				<input name="key" th:value="${key}"/>
+			</div>
+		</form> 
+	</div>
+	-->
+	</div>
+	<!-- <footer style="text-align: center;background-color:powderblue">Copyright © 2020 Nguyễn Văn Huy <br/> ---</footer> -->
+</body>
+
+</html>
